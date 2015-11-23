@@ -13,12 +13,36 @@ function loaded() {
   
 }
 
+function openWebSocket(){
+    var ws = new WebSocket('ws://localhost:8080/Mlocker/endpoint',
+                       ['appProtocol', 'appProtocol-v2']);
+                       
+    ws.onopen = function () { 
+        console.log("Ws Connection Established");
+        console.log("Sending JSESSIONID : ");
+        console.log(cipher.JSESSIONID);
+        ws.send(cipher.JSESSIONID);
+    }
+
+    ws.onmessage = function(msg) { 
+        console.log("Message recieved by the Web Client");
+        if(msg.data instanceof Blob) { 
+            console.log("Data is received as the Text");
+        } else {
+            console.log("Decryption is going to be processed + message is :");
+            console.log(msg.data);
+            decrypt(msg.data,cipher);
+        }
+    }
+    
+}
+
 function parseJsonData(jsonData){
     var json = JSON.parse(jsonData);
     for(i=0;i<json.credentails.length;i++){
         var logins=json.credentails[i];
         console.log( logins.site +" " + logins.user+" "+logins.pass  );
-//       Enter code for opening the new tab
+//       on  code for opening the new tab
     }
 }
 
@@ -27,8 +51,8 @@ var cipher = {}
 function sendingDataFormat(cipher,JsessionId){
     var g=sjcl.bitArray;
     var temp=g.concat(cipher.key,cipher.iv);
-    if(g.bitLength(temp)!=128){
-        console.log("Error key not of 128 bit");
+    if(g.bitLength(temp)!= 256){
+        console.log("Error key not of 256 bit");
     }
     var base64=sjcl.codec.base64.fromBits(temp);
     console.log(base64);
@@ -53,6 +77,7 @@ function generateCipher(){
     cipher.key = g.key.slice(0, f.ks / 32);
     var qrData= sendingDataFormat(cipher,cipher.JSESSIONID);
     qrCodeGenerator(qrData);
+    openWebSocket();
 }
 
 function qrCodeGenerator(temp){
@@ -82,14 +107,14 @@ function decrypt(ciphertext ,cipher){
     var key=cipher.key;
     var iv=cipher.iv;
     var aes = new sjcl.cipher.aes(key);
-    try {
+//    try {
       console.log("In the decrypt Function. Let's see What happens");
-      var plainBits = sjcl.mode.gcm.decrypt(aes,ciphertext,iv,sjcl.code.utf8String.fromBits("AAD"),128);
+      var plainBits = sjcl.mode.gcm.decrypt(aes,ciphertext,iv,sjcl.codec.utf8String.toBits("AAD"),128);
       var plainText = sjcl.codec.utf8String.fromBits(plainBits);
       openTab(plainText);
-    } catch (e) {
-      error("Can't decrypt: " + e);
-    }
+//    } catch (e) {
+//      error("Can't decrypt: " + e);
+//    }
     
 }
 
