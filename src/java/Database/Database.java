@@ -6,6 +6,7 @@
 package Database;
 
 import java.util.Hashtable;
+import org.bouncycastle.jcajce.provider.symmetric.HC128;
 
 /**
  *
@@ -14,7 +15,7 @@ import java.util.Hashtable;
 public class Database {
 //    This class is responsible for storing the data mapped with the Database
     static Database db=null;
-    Hashtable<String,byte[]> table;
+  private  Hashtable<String,String> table=new Hashtable<String,String>();
     
     private Database() {
     }
@@ -26,11 +27,15 @@ public class Database {
         return db;
     }
     
-   public void addData(String key,byte[] value){
+   public void addData(String key,String value){
         table.put(key, value);
     }
     
-    public byte[] getData(String key){
+    public String getData(String key){
         return table.get(key);
+    }
+    
+    public void clearKey(String key){
+        table.remove(key);
     }
 }

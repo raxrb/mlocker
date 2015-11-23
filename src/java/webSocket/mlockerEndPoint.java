@@ -37,18 +37,19 @@ public class mlockerEndPoint {
         }
         final String  msg=message;
         final Session  sn=session;
-        Database.getInstance().addData(message,null);
-        Thread t;
+        Database.getInstance().clearKey(message);
+        System.out.println("Thread is created in the next line");
         
-        t = new Thread(){
+        Thread t= new Thread(){
             
             @Override
             public void run() {
-                super.run(); //To change body of generated methods, choose Tools | Templates.
+//                super.run(); //To change body of generated methods, choose Tools | Templates.
 //                Add support for Mutex and other stuff
+                System.out.println("Thread Running Started");
                 while( Database.getInstance().getData(msg) == null ){
                     try {
-                        wait(1000L);
+                        Thread.sleep(100);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(mlockerEndPoint.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -56,15 +57,23 @@ public class mlockerEndPoint {
                 if( Database.getInstance().getData(msg)!=null){
                     
                     try {
-                        sn.getBasicRemote().sendText(Database.getInstance().getData(msg), true);
+
+                        try {
+                            sn.getBasicRemote().sendText(Database.getInstance().getData(msg), true);
+                        } catch (IOException ex) {
+                            System.out.println("Error waiting and replying the data");
+                            Logger.getLogger(mlockerEndPoint.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        sn.close();
                     } catch (IOException ex) {
-                        System.out.println("Error waiting and replying the data");
+                        System.out.println("Error while closing the socket");
                         Logger.getLogger(mlockerEndPoint.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    
                 }
             }
         };
+       t.start();
+                
         
                 return null;
     }

@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.apache.tomcat.util.http.Cookies;
 
 /**
  *
@@ -100,6 +99,7 @@ public class main extends HttpServlet {
         
 //        assert body==null;
         session.setAttribute("data", body);
+        Database.getInstance().addData(session.getId(), body);
         System.out.println(" Content sent by the mobile is ");
         System.out.println(body);
         
