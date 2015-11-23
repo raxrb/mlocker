@@ -1,0 +1,15 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 14 Oct, 2015, 7:50:56 PM
+    Author     : rax
+*/
+
+#qrcode {
+  width:160px;
+  height:160px;
+  margin-top:15px;
+}
